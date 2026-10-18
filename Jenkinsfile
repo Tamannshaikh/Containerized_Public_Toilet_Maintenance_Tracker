@@ -132,21 +132,14 @@ pipeline {
                         echo '[DEPLOY] Executing standalone local staging deployment.'
                     }
 
-                    // Step 7.3: Clean previous staging instance on targetPort (if not 8081/8080) and launch newly built JAR
-                    bat """
-                        @echo off
-                        echo [DEPLOY] Checking and preparing port ${env.ACTIVE_DEPLOY_PORT}...
-                        powershell -Command "if (${env.ACTIVE_DEPLOY_PORT} -ne 8081 -and ${env.ACTIVE_DEPLOY_PORT} -ne 8080) { Get-NetTCPConnection -LocalPort ${env.ACTIVE_DEPLOY_PORT} -ErrorAction SilentlyContinue | ForEach-Object { Write-Output ('Stopping previous staging process: PID ' + \$_.OwningProcess); Stop-Process -Id \$_.OwningProcess -Force -ErrorAction SilentlyContinue } }"
-                        echo [DEPLOY] Launching newly built JAR: deploy\\staging\\app.jar on port ${env.ACTIVE_DEPLOY_PORT}...
-                        start /B java -jar deploy\\staging\\app.jar --server.port=${env.ACTIVE_DEPLOY_PORT} > deploy\\staging\\app.log 2>&1
-                    """
-
-                    // Step 7.4: Actively wait for application startup and verify health (fails stage if unhealthy)
-                    echo "[DEPLOY] Waiting for application startup on port ${env.ACTIVE_DEPLOY_PORT}..."
-                    bat """
-                        @echo off
-                        powershell -Command "\$maxAttempts = 15; \$healthy = \$false; for (\$i = 1; \$i -le \$maxAttempts; \$i++) { Start-Sleep -Seconds 2; try { \$r = Invoke-WebRequest -Uri 'http://localhost:${env.ACTIVE_DEPLOY_PORT}/api/v1/health' -UseBasicParsing -TimeoutSec 3; if (\$r.StatusCode -eq 200) { \$data = \$r.Content | ConvertFrom-Json; if (\$data.status -eq 'UP') { Write-Output ('[DEPLOY] Application is UP and HEALTHY on port ${env.ACTIVE_DEPLOY_PORT} (Attempt ' + \$i + ')'); \$healthy = \$true; break } } } catch { Write-Output ('[DEPLOY] Waiting for application initialization... (Attempt ' + \$i + '/' + \$maxAttempts + ')') } }; if (-not \$healthy) { Write-Error '[DEPLOY] ERROR: Newly deployed application failed to become healthy within timeout!'; exit 1 }"
-                    """
+                    // Step 7.3: Launch newly built JAR and wait for health verification
+                    withEnv(['JENKINS_NODE_COOKIE=dontKillMe', 'BUILD_ID=dontKillMe']) {
+                        bat """
+                            @echo off
+                            powershell -ExecutionPolicy Bypass -File deploy\\staging\\deploy-app.ps1 -Port ${env.ACTIVE_DEPLOY_PORT}
+                            powershell -ExecutionPolicy Bypass -File deploy\\staging\\verify-health.ps1 -Port ${env.ACTIVE_DEPLOY_PORT} -MaxAttempts 20
+                        """
+                    }
                 }
             }
         }
@@ -166,7 +159,7 @@ pipeline {
                     echo "Probing Newly Deployed Health Endpoint: http://localhost:${probePort}/api/v1/health"
                     bat """
                         @echo off
-                        powershell -Command "\$resp = Invoke-WebRequest -Uri 'http://localhost:${probePort}/api/v1/health' -UseBasicParsing -TimeoutSec 10; Write-Output ('HTTP Status Code: ' + \$resp.StatusCode); \$json = \$resp.Content | ConvertFrom-Json; Write-Output ('Health JSON Status: ' + \$json.status); Write-Output ('Service Name: ' + \$json.service); Write-Output ('Service Version: ' + \$json.version); if (\$resp.StatusCode -eq 200 -and \$json.status -eq 'UP') { Write-Output '>>> SMOKE TEST PASSED: Newly deployed application verified healthy on port ${probePort}! <<<'; exit 0 } else { Write-Error '>>> SMOKE TEST FAILED: Health verification did not return HTTP 200 and status UP! <<<'; exit 1 }"
+                        powershell -ExecutionPolicy Bypass -File deploy\\staging\\verify-health.ps1 -Port ${probePort} -MaxAttempts 5
                     """
 
                     echo "Probing Newly Deployed Facilities Endpoint: http://localhost:${probePort}/api/v1/facilities"
