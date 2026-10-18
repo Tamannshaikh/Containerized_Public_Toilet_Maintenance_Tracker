@@ -16,7 +16,7 @@
 - **Current Task:** Task 07 – Jenkins Continuous Integration (CI)
 - **Current Active Branch:** `feature/maintenance-ticket-api`
 - **Document Version:** 1.0.0
-- **Status:** Pipeline Configured & Locally Verified (22/22 Tests Passing, Build Success, Awaiting Jenkins Execution Evidence)
+- **Status:** Pipeline Configured, Executed & Verified on Jenkins (Build #7: SUCCESS, 22/22 Tests Passing, Artifact Archived)
 
 ---
 
@@ -332,12 +332,78 @@ Local execution of `mvn clean test` and `mvn package -DskipTests` yielded a 100%
 [INFO] ------------------------------------------------------------------------
 ```
 
-### 7.2 Generated Build Artifact Details
+### 7.2 Actual Jenkins Pipeline Execution (Build #7 — SUCCESS)
+
+The pipeline was executed on the host Jenkins instance (`http://localhost:8080`) by student **Tamanna Shahid Ashfaq Shaikh** with the following verified execution parameters:
+
+- **Jenkins Job:** `Public-Toilet-Maintenance-CI`
+- **Build Number:** **Build #7**
+- **Git Commit:** `0fc535f` (GitHub remote `origin/main` / `origin/feature/maintenance-ticket-api`)
+- **Build Result:** **`SUCCESS`**
+
+#### Jenkins Pipeline Stage Execution Summary:
+| Stage # | Stage Name | Status | Verified Actions & Logs |
+|:---:|---|:---:|---|
+| 1 | **Checkout** | `SUCCESS` | Cloned repository from GitHub, checked out latest commit `0fc535f`. |
+| 2 | **Verify Environment** | `SUCCESS` | Injected configured tools: `JDK-21` (Java 21.0.12) and `Maven` (Maven 3.9.16). |
+| 3 | **Compile** | `SUCCESS` | `mvn clean compile` compiled 33 Java source files to `target/classes`. |
+| 4 | **Run Automated Tests** | `SUCCESS` | `mvn test` executed full test suite: **22 tests run, 0 failures, 0 errors, 0 skipped**. |
+| 5 | **Package Application** | `SUCCESS` | `mvn package -DskipTests` generated executable Spring Boot fat JAR. |
+| 6 | **Archive Artifacts** | `SUCCESS` | Fingerprinted and archived `public-toilet-maintenance-tracker-1.0.0-SNAPSHOT.jar` (48.2 MB). |
+| Post | **Publish JUnit Test Results** | `SUCCESS` | Recorded and published 22 JUnit test results into Jenkins test dashboard. |
+
+#### Actual Jenkins Build #7 Console Log Snippet:
+```text
+[Pipeline] echo
+=====================================================
+[Pipeline] echo
+STAGE 4: Executing automated unit & integration tests
+=====================================================
+[Pipeline] bat
+C:\ProgramData\Jenkins\.jenkins\workspace\Public-Toilet-Maintenance-CI>mvn test 
+[INFO] Running com.tracker.toilet.CleaningLogControllerTest
+Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 9.602 s
+[INFO] Running com.tracker.toilet.DashboardControllerTest
+Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.078 s
+[INFO] Running com.tracker.toilet.FacilityControllerTest
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.138 s
+[INFO] Running com.tracker.toilet.HealthControllerTest
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.030 s
+[INFO] Running com.tracker.toilet.MaintenanceTicketControllerTest
+Tests run: 9, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.155 s
+[INFO] Running com.tracker.toilet.ToiletMaintenanceApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.991 s
+[INFO] 
+[INFO] Results:
+[INFO] Tests run: 22, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+...
+[Pipeline] archiveArtifacts
+Archiving artifacts
+Recording fingerprints
+[Pipeline] echo
+Recording automated test results in JUnit format...
+[Pipeline] junit
+Recording test results
+[Pipeline] echo
+=====================================================
+[Pipeline] echo
+SUCCESS: Jenkins CI Pipeline for public-toilet-maintenance-tracker completed successfully!
+[Pipeline] echo
+Archived Artifact: target/public-toilet-maintenance-tracker-1.0.0-SNAPSHOT.jar
+[Pipeline] echo
+=====================================================
+[Pipeline] End of Pipeline
+Finished: SUCCESS
+```
+
+### 7.3 Generated Build Artifact Details
 - **JAR Filename:** `public-toilet-maintenance-tracker-1.0.0-SNAPSHOT.jar`
 - **Location:** `C:\Users\Sajiya\Desktop\Containerized_Public_Toilet_Maintenance_Tracker\target\public-toilet-maintenance-tracker-1.0.0-SNAPSHOT.jar`
-- **File Size:** `48,221,216 bytes` (~48.2 MB)
-- **Archive Status:** Configured for automated archiving via Jenkins `archiveArtifacts artifacts: 'target/*.jar'`
-- **JUnit Reports:** 6 XML test reports successfully generated in `target/surefire-reports/`:
+- **Archived in Jenkins:** `C:\ProgramData\Jenkins\.jenkins\jobs\Public-Toilet-Maintenance-CI\builds\7\archive\target\public-toilet-maintenance-tracker-1.0.0-SNAPSHOT.jar`
+- **File Size:** `48,221,257 bytes` (~48.2 MB)
+- **Archive Status:** Successfully archived in Jenkins Build #7.
+- **JUnit Reports:** 6 XML test reports archived in Jenkins:
   - `TEST-com.tracker.toilet.CleaningLogControllerTest.xml`
   - `TEST-com.tracker.toilet.DashboardControllerTest.xml`
   - `TEST-com.tracker.toilet.FacilityControllerTest.xml`
