@@ -155,22 +155,24 @@ Containerized_Public_Toilet_Maintenance_Tracker/
 ### Multi-Stage Container Packaging
 [`Dockerfile`](./Dockerfile) executes a 2-stage build:
 1. **Builder Stage (`maven:3.9-eclipse-temurin-17`):** Resolves dependencies offline, compiles Java source code, and packages the JAR.
-2. **Runtime Stage (`eclipse-temurin:17-jre-alpine`):** Copies only the built JAR, sets up an unprivileged user `appuser` (UID 1000) for security, and exposes port `8080`.
+2. **Runtime Stage (`eclipse-temurin:17-jre-alpine`):** Copies only the built JAR, sets up an unprivileged user `appuser` (UID 1000) for security, and exposes port `8081`.
 
-### CI/CD Pipeline
-[`Jenkinsfile`](./Jenkinsfile) orchestrates 6 declarative stages:
+### CI/CD Deployment Pipeline
+[`Jenkinsfile`](./Jenkinsfile) orchestrates 8 declarative stages:
 1. **Checkout:** Checks out source code from Git repository.
-2. **Code Compile & Unit Test:** Executes `mvn clean test`.
-3. **Package Application:** Packages JAR artifact and archives it.
-4. **Selenium UI Testing:** Executes automated browser tests.
-5. **Docker Build:** Builds container image `public-toilet-maintenance-tracker:${BUILD_NUMBER}`.
-6. **Docker CD & Deployment:** Executes `docker compose up -d` on target environment.
+2. **Verify Environment:** Validates host Java and Maven runtime tools.
+3. **Compile:** Compiles source code with `mvn clean compile`.
+4. **Run Automated Tests:** Executes 22 unit and integration tests with JUnit reporting.
+5. **Package Application:** Packages executable Spring Boot JAR with `mvn package -DskipTests`.
+6. **Archive Artifacts:** Archives `target/*.jar` in Jenkins with fingerprinting.
+7. **Deploy Application (Staging):** Prepares staging artifact (`deploy/staging/app.jar`), checks Docker daemon availability, and verifies port `8081`.
+8. **Smoke Test and Health Verification:** Automatically probes `http://localhost:8081/api/v1/health` and `/api/v1/facilities` to verify operational uptime.
 
 ---
 
-## 8. Current Limitations & Planned Work
+## 8. Port Configuration & Environment Architecture
 
-- **Host Port 8080 Notice:** Jenkins runs as a Windows Service on host port `8080`. Running Docker Compose on the host requires remapping the application host port to `8081` (`8081:8080`) to avoid port binding conflicts.
-- **Data Model:** Full Spring Data JPA entities and repositories are scheduled for implementation in **Task 05**.
-- **Web Frontend:** Dashboard UI assets in `frontend/` are scheduled for **Task 06**.
-- **Testing:** Selenium UI test suite is scheduled for **Task 09**.
+- **Port Isolation:** Jenkins runs as a Windows Service on host port `8080`. The Spring Boot Maintenance Tracker application is mapped to port `8081` (`8081:8081`) across `application.properties`, `Dockerfile`, `docker-compose.yml`, and `Jenkinsfile` to prevent network contention.
+- **Continuous Testing:** 22 automated tests covering facility management, cleaning logs, maintenance ticket lifecycles, and health probes pass with 100% success.
+- **Selenium UI Testing:** Scheduled for implementation in **Task 09**.
+

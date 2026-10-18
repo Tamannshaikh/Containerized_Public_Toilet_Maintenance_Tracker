@@ -8,8 +8,9 @@ services:
     container_name: public-toilet-app
     restart: always
     ports:
-      - "8080:8080"
+      - "8081:8081"
     environment:
+      - SERVER_PORT=8081
       - SPRING_DATASOURCE_URL=jdbc:postgresql://public-toilet-db:5432/toilet_tracker_db
       - SPRING_DATASOURCE_USERNAME=tracker_user
       - SPRING_DATASOURCE_PASSWORD=tracker_secret
