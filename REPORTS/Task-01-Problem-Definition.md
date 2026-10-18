@@ -225,17 +225,17 @@ The Minimum Viable Product (MVP) encompasses five core functional modules:
 
 1. **Working Software:** A fully functional, containerized Spring Boot 3 web application and PostgreSQL database with the 5 MVP maintenance tracking features.
 2. **Infrastructure as Code & CI/CD Pipelines:**
-   - Production multi-stage [`Dockerfile`](file:///c:/Users/Sajiya/Desktop/Public-Parking-DevOps/Dockerfile).
-   - Local multi-service orchestration [`docker-compose.yml`](file:///c:/Users/Sajiya/Desktop/Public-Parking-DevOps/docker-compose.yml).
-   - Automated declarative [`Jenkinsfile`](file:///c:/Users/Sajiya/Desktop/Public-Parking-DevOps/Jenkinsfile).
+   - Production multi-stage [`Dockerfile`](../Dockerfile).
+   - Local multi-service orchestration [`docker-compose.yml`](../docker-compose.yml).
+   - Automated declarative [`Jenkinsfile`](../Jenkinsfile).
    - Ansible configuration management playbooks.
 3. **Automated Test Suites:**
    - JUnit 5 / Spring Boot unit and integration tests.
    - Selenium WebDriver automated browser acceptance tests.
 4. **Documentation & Academic Reports:**
-   - 15 individual task completion reports in [`REPORTS/`](file:///c:/Users/Sajiya/Desktop/Public-Parking-DevOps/REPORTS).
-   - System architecture diagrams in [`docs/architecture/`](file:///c:/Users/Sajiya/Desktop/Public-Parking-DevOps/docs/architecture).
-   - Screenshot catalog in [`docs/screenshots/`](file:///c:/Users/Sajiya/Desktop/Public-Parking-DevOps/docs/screenshots).
+   - 15 individual task completion reports in [`REPORTS/`](./).
+   - System architecture diagrams in [`docs/architecture/`](../docs/architecture/).
+   - Screenshot catalog in [`docs/screenshots/`](../docs/screenshots/).
    - Project Viva Voce defense presentation guide.
 
 ---
@@ -247,7 +247,7 @@ The Minimum Viable Product (MVP) encompasses five core functional modules:
 3. **Step 3 – Domain Realignment:** Formulated the formal problem statement, background, stakeholder matrix, and functional specifications for the *Containerized Public Toilet Maintenance Tracker*, resolving the previous template discrepancy.
 4. **Step 4 – MVP Scope Formulation:** Identified and specified the five essential MVP features (Entry, Search/Filter, KPIs, Drill-Down, Alerts).
 5. **Step 5 – Acceptance Criteria & Metric Definition:** Established measurable thresholds for all functional and non-functional requirements.
-6. **Step 6 – Documentation Generation:** Authored the complete, academically compliant Task 01 report in [`REPORTS/Task-01-Problem-Definition.md`](file:///c:/Users/Sajiya/Desktop/Public-Parking-DevOps/REPORTS/Task-01-Problem-Definition.md).
+6. **Step 6 – Documentation Generation:** Authored the complete, academically compliant Task 01 report in [`REPORTS/Task-01-Problem-Definition.md`](./Task-01-Problem-Definition.md).
 
 ---
 
@@ -283,7 +283,7 @@ The Minimum Viable Product (MVP) encompasses five core functional modules:
 
 
 
-All visual evidence for Task 01 must be saved in [`docs/screenshots/Task-01/`](file:///c:/Users/Sajiya/Desktop/Public-Parking-DevOps/docs/screenshots/Task-01):
+All visual evidence for Task 01 must be saved in [`docs/screenshots/Task-01/`](../docs/screenshots/Task-01):
 
 | Screenshot Filename | Exact Screen to Capture | Required Visual Elements |
 |---|---|---|

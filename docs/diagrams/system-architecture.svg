@@ -1,0 +1,198 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 680" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 20px; font-weight: 700; fill: #0f172a; }
+      .subtitle { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 13px; font-weight: 500; fill: #475569; }
+      .layer-title { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 14px; font-weight: 700; fill: #1e293b; }
+      .box-title { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 12px; font-weight: 700; fill: #0f172a; }
+      .box-desc { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10px; font-weight: 400; fill: #475569; }
+      .badge-existing { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 9px; font-weight: 700; fill: #065f46; }
+      .badge-planned { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 9px; font-weight: 700; fill: #9a3412; }
+      .port-text { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 10px; font-weight: 700; fill: #2563eb; }
+      .meta { font-family: 'Segoe UI', system-ui, sans-serif; font-size: 11px; fill: #64748b; }
+    </style>
+
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="680" rx="12" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- Header -->
+  <text x="40" y="38" class="title">System Architecture: Existing vs. Planned Implementation</text>
+  <text x="40" y="58" class="subtitle">Containerized Public Toilet Maintenance Tracker | Student: Tamanna Shaikh (24102A2006) | Task 03</text>
+  <line x1="40" y1="72" x2="960" y2="72" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4" />
+
+  <!-- Legend -->
+  <g transform="translate(680, 25)">
+    <rect x="0" y="0" width="16" height="16" rx="4" fill="#dcfce7" stroke="#10b981" stroke-width="1.5" />
+    <text x="22" y="12" class="meta" font-weight="600" fill="#065f46">Implemented &amp; Verified</text>
+    <rect x="160" y="0" width="16" height="16" rx="4" fill="#ffedd5" stroke="#f97316" stroke-width="1.5" stroke-dasharray="3 2" />
+    <text x="182" y="12" class="meta" font-weight="600" fill="#9a3412">Planned (Tasks 05–12)</text>
+  </g>
+
+  <!-- ================= 1. CLIENT / PRESENTATION LAYER ================= -->
+  <rect x="40" y="90" width="920" height="95" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="55" y="112" class="layer-title">1. Presentation &amp; Frontend Layer (Web Browser)</text>
+
+  <!-- Box 1A: Existing Static Scaffold -->
+  <g transform="translate(60, 125)">
+    <rect width="260" height="50" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="1.5" />
+    <text x="12" y="20" class="box-title">Frontend Directory Scaffold</text>
+    <text x="12" y="35" class="box-desc">frontend/.gitkeep (Ready for web assets)</text>
+    <rect x="200" y="8" width="50" height="14" rx="3" fill="#a7f3d0" />
+    <text x="225" y="18" class="badge-existing" text-anchor="middle">EXISTING</text>
+  </g>
+
+  <!-- Box 1B: Planned Dashboard UI -->
+  <g transform="translate(340, 125)">
+    <rect width="280" height="50" rx="6" fill="#ffedd5" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 3" />
+    <text x="12" y="20" class="box-title">Searchable Dashboard UI</text>
+    <text x="12" y="35" class="box-desc">Tabular Filter View &amp; Summary KPI Cards</text>
+    <rect x="215" y="8" width="55" height="14" rx="3" fill="#fed7aa" />
+    <text x="242" y="18" class="badge-planned" text-anchor="middle">PLANNED</text>
+  </g>
+
+  <!-- Box 1C: Planned Incident Modal & Forms -->
+  <g transform="translate(640, 125)">
+    <rect width="300" height="50" rx="6" fill="#ffedd5" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 3" />
+    <text x="12" y="20" class="box-title">Incident Logging &amp; Drill-Down Modal</text>
+    <text x="12" y="35" class="box-desc">Citizen Defect Reporting &amp; Status Transitions</text>
+    <rect x="235" y="8" width="55" height="14" rx="3" fill="#fed7aa" />
+    <text x="262" y="18" class="badge-planned" text-anchor="middle">PLANNED</text>
+  </g>
+
+  <!-- Flow Arrow: Presentation -> REST API -->
+  <path d="M 500 185 L 500 215" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="510" y="204" class="port-text">HTTP / REST (JSON)</text>
+
+  <!-- ================= 2. APPLICATION / BACKEND LAYER (Spring Boot 3) ================= -->
+  <rect x="40" y="220" width="920" height="175" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="55" y="242" class="layer-title">2. Application Layer (Spring Boot 3.2.4 &amp; Java 17 - Tomcat Port 8080)</text>
+
+  <!-- 2A: Existing Health Controller -->
+  <g transform="translate(60, 255)">
+    <rect width="260" height="60" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="1.5" />
+    <text x="12" y="20" class="box-title">HealthController.java</text>
+    <text x="12" y="35" class="box-desc">GET /api/v1/health</text>
+    <text x="12" y="48" class="box-desc">Status: UP (Runtime Verified)</text>
+    <rect x="200" y="8" width="50" height="14" rx="3" fill="#a7f3d0" />
+    <text x="225" y="18" class="badge-existing" text-anchor="middle">EXISTING</text>
+  </g>
+
+  <!-- 2B: Planned Domain Controllers -->
+  <g transform="translate(340, 255)">
+    <rect width="280" height="60" rx="6" fill="#ffedd5" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 3" />
+    <text x="12" y="20" class="box-title">Facility &amp; Ticket REST Controllers</text>
+    <text x="12" y="35" class="box-desc">/api/v1/facilities, /api/v1/tickets</text>
+    <text x="12" y="48" class="box-desc">/api/v1/cleaning-logs, /api/v1/kpis</text>
+    <rect x="215" y="8" width="55" height="14" rx="3" fill="#fed7aa" />
+    <text x="242" y="18" class="badge-planned" text-anchor="middle">PLANNED</text>
+  </g>
+
+  <!-- 2C: Planned Service Layer -->
+  <g transform="translate(640, 255)">
+    <rect width="300" height="60" rx="6" fill="#ffedd5" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 3" />
+    <text x="12" y="20" class="box-title">Business Logic &amp; Alert Engine</text>
+    <text x="12" y="35" class="box-desc">FacilityService, IncidentService, AlertService</text>
+    <text x="12" y="48" class="box-desc">SLA 4-Hour Escalation &amp; Hazard Flags</text>
+    <rect x="235" y="8" width="55" height="14" rx="3" fill="#fed7aa" />
+    <text x="262" y="18" class="badge-planned" text-anchor="middle">PLANNED</text>
+  </g>
+
+  <!-- 2D: Existing Application Bootstrap -->
+  <g transform="translate(60, 325)">
+    <rect width="260" height="55" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="1.5" />
+    <text x="12" y="18" class="box-title">ToiletMaintenanceApplication.java</text>
+    <text x="12" y="32" class="box-desc">Spring Boot Core Application Context</text>
+    <text x="12" y="45" class="box-desc">application.properties configured</text>
+    <rect x="200" y="8" width="50" height="14" rx="3" fill="#a7f3d0" />
+    <text x="225" y="18" class="badge-existing" text-anchor="middle">EXISTING</text>
+  </g>
+
+  <!-- 2E: Planned Spring Data JPA Entities & Repositories -->
+  <g transform="translate(340, 325)">
+    <rect width="600" height="55" rx="6" fill="#ffedd5" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 3" />
+    <text x="12" y="18" class="box-title">Spring Data JPA Entities &amp; Repositories (Task 05)</text>
+    <text x="12" y="32" class="box-desc">Entities: Facility, IncidentTicket, CleaningLog, Ward</text>
+    <text x="12" y="45" class="box-desc">Repositories: FacilityRepository, TicketRepository (Derived Queries)</text>
+    <rect x="535" y="8" width="55" height="14" rx="3" fill="#fed7aa" />
+    <text x="562" y="18" class="badge-planned" text-anchor="middle">PLANNED</text>
+  </g>
+
+  <!-- Flow Arrow: Backend -> Database -->
+  <path d="M 500 395 L 500 425" stroke="#64748b" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="510" y="414" class="port-text">Spring Data JPA / Hibernate</text>
+
+  <!-- ================= 3. DATA PERSISTENCE LAYER ================= -->
+  <rect x="40" y="430" width="920" height="95" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="55" y="452" class="layer-title">3. Data Persistence Layer</text>
+
+  <!-- 3A: Existing H2 Memory DB -->
+  <g transform="translate(60, 465)">
+    <rect width="400" height="48" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="1.5" />
+    <text x="12" y="18" class="box-title">H2 In-Memory Database (Unit Testing)</text>
+    <text x="12" y="34" class="box-desc">jdbc:h2:mem:toilet_db (Fast CI test execution)</text>
+    <rect x="340" y="8" width="50" height="14" rx="3" fill="#a7f3d0" />
+    <text x="365" y="18" class="badge-existing" text-anchor="middle">EXISTING</text>
+  </g>
+
+  <!-- 3B: Planned PostgreSQL Containerized DB -->
+  <g transform="translate(480, 465)">
+    <rect width="460" height="48" rx="6" fill="#ffedd5" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 3" />
+    <text x="12" y="18" class="box-title">PostgreSQL 15 Alpine (Production Runtime)</text>
+    <text x="12" y="34" class="box-desc">Container public-toilet-db:5432 / toilet_tracker_db (Persistent volume pgdata)</text>
+    <rect x="395" y="8" width="55" height="14" rx="3" fill="#fed7aa" />
+    <text x="422" y="18" class="badge-planned" text-anchor="middle">PLANNED</text>
+  </g>
+
+  <!-- ================= 4. DEVOPS & INFRASTRUCTURE LAYER ================= -->
+  <rect x="40" y="540" width="920" height="120" rx="10" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" filter="url(#shadow)"/>
+  <text x="55" y="562" class="layer-title">4. DevOps, Containerization &amp; CI/CD Pipeline Layer</text>
+
+  <!-- 4A: Existing Jenkins Pipeline Script -->
+  <g transform="translate(60, 575)">
+    <rect width="210" height="65" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="1.5" />
+    <text x="12" y="18" class="box-title">Jenkinsfile (Declarative)</text>
+    <text x="12" y="33" class="box-desc">6 Stages: Checkout, Compile,</text>
+    <text x="12" y="46" class="box-desc">Package, Selenium, Docker</text>
+    <rect x="150" y="8" width="50" height="14" rx="3" fill="#a7f3d0" />
+    <text x="175" y="18" class="badge-existing" text-anchor="middle">EXISTING</text>
+  </g>
+
+  <!-- 4B: Host Jenkins Service (Port 8080) -->
+  <g transform="translate(285, 575)">
+    <rect width="210" height="65" rx="6" fill="#fef2f2" stroke="#dc2626" stroke-width="1.5" />
+    <text x="12" y="18" class="box-title">Host Jenkins Service</text>
+    <text x="12" y="33" class="box-desc">Port 8080 (RUNNING: PID 7880)</text>
+    <text x="12" y="46" class="box-desc">Conflict Isolation Required</text>
+    <rect x="150" y="8" width="50" height="14" rx="3" fill="#fecaca" />
+    <text x="175" y="18" class="badge-existing" fill="#991b1b" text-anchor="middle">HOST ACTIVE</text>
+  </g>
+
+  <!-- 4C: Multi-Stage Dockerfile -->
+  <g transform="translate(510, 575)">
+    <rect width="210" height="65" rx="6" fill="#dcfce7" stroke="#10b981" stroke-width="1.5" />
+    <text x="12" y="18" class="box-title">Dockerfile (Multi-Stage)</text>
+    <text x="12" y="33" class="box-desc">Stage 1: maven:3.9 builder</text>
+    <text x="12" y="46" class="box-desc">Stage 2: temurin-17-jre (appuser)</text>
+    <rect x="150" y="8" width="50" height="14" rx="3" fill="#a7f3d0" />
+    <text x="175" y="18" class="badge-existing" text-anchor="middle">EXISTING</text>
+  </g>
+
+  <!-- 4D: Docker Compose & Port Remapping -->
+  <g transform="translate(735, 575)">
+    <rect width="210" height="65" rx="6" fill="#ffedd5" stroke="#f97316" stroke-width="1.5" stroke-dasharray="4 3" />
+    <text x="12" y="18" class="box-title">Docker Compose CD</text>
+    <text x="12" y="33" class="box-desc">Remapped Host Port 8081:8080</text>
+    <text x="12" y="46" class="box-desc">Multi-Container Bridge Network</text>
+    <rect x="145" y="8" width="55" height="14" rx="3" fill="#fed7aa" />
+    <text x="172" y="18" class="badge-planned" text-anchor="middle">PLANNED</text>
+  </g>
+</svg>

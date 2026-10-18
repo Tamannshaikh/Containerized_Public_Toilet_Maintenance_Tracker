@@ -1,0 +1,177 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 500" width="100%" height="100%">
+  <defs>
+    <style>
+      .title { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 22px; font-weight: 700; fill: #1e293b; }
+      .subtitle { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 13px; font-weight: 500; fill: #64748b; }
+      .phase-title { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 15px; font-weight: 700; fill: #ffffff; }
+      .phase-desc { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 400; fill: #f1f5f9; }
+      .phase-tool { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 10px; font-weight: 600; fill: #0f172a; }
+      .meta { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; font-size: 11px; font-weight: 500; fill: #475569; }
+    </style>
+    
+    <linearGradient id="planGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6" />
+      <stop offset="100%" stop-color="#1d4ed8" />
+    </linearGradient>
+    <linearGradient id="codeGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6366f1" />
+      <stop offset="100%" stop-color="#4338ca" />
+    </linearGradient>
+    <linearGradient id="buildGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0284c7" />
+      <stop offset="100%" stop-color="#0369a1" />
+    </linearGradient>
+    <linearGradient id="testGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0d9488" />
+      <stop offset="100%" stop-color="#0f766e" />
+    </linearGradient>
+    <linearGradient id="releaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981" />
+      <stop offset="100%" stop-color="#047857" />
+    </linearGradient>
+    <linearGradient id="deployGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <linearGradient id="operateGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ea580c" />
+      <stop offset="100%" stop-color="#c2410c" />
+    </linearGradient>
+    <linearGradient id="monitorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6" />
+      <stop offset="100%" stop-color="#6d28d9" />
+    </linearGradient>
+
+    <!-- Drop Shadow Filter -->
+    <filter id="cardShadow" x="-10%" y="-10%" width="125%" height="125%">
+      <feDropShadow dx="0" dy="4" stdDeviation="5" flood-color="#0f172a" flood-opacity="0.08" />
+    </filter>
+
+    <!-- Marker Arrow -->
+    <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 8 5 L 0 9 z" fill="#64748b" />
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="500" rx="16" fill="#f8fafc" stroke="#e2e8f0" stroke-width="2"/>
+
+  <!-- Header Banner -->
+  <text x="50" y="45" class="title">DevOps Continuous Lifecycle Architecture</text>
+  <text x="50" y="68" class="subtitle">Containerized Public Toilet Maintenance Tracker | Student: Tamanna Shaikh (24102A2006)</text>
+  <text x="950" y="55" class="meta" text-anchor="end">VIT Mumbai • Task 02 Architecture</text>
+
+  <line x1="50" y1="85" x2="950" y2="85" stroke="#cbd5e1" stroke-width="1.5" stroke-dasharray="4 4" />
+
+  <!-- Flow Connector Path (Looping continuous feedback curve) -->
+  <!-- Top Row: Plan -> Code -> Build -> Test -->
+  <path d="M 195 180 L 255 180" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <path d="M 425 180 L 485 180" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <path d="M 655 180 L 715 180" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <!-- Turn from Test to Release: right side curve down -->
+  <path d="M 885 180 C 940 180, 940 330, 885 330" fill="none" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <!-- Bottom Row (Right to Left): Release -> Deploy -> Operate -> Monitor -->
+  <path d="M 715 330 L 655 330" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <path d="M 485 330 L 425 330" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)" />
+  <path d="M 255 330 L 195 330" stroke="#64748b" stroke-width="2.5" marker-end="url(#arrow)" />
+
+  <!-- Feedback from Monitor to Plan: left side curve up -->
+  <path d="M 125 270 C 60 270, 60 210, 125 190" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow)" />
+  <text x="50" y="245" class="meta" fill="#8b5cf6" font-size="10" transform="rotate(-90 50 245)">Continuous Feedback</text>
+
+  <!-- 1. PLAN -->
+  <g transform="translate(60, 120)" filter="url(#cardShadow)">
+    <rect width="135" height="120" rx="10" fill="url(#planGrad)" />
+    <text x="15" y="28" class="phase-title">1. PLAN</text>
+    <text x="15" y="48" class="phase-desc">• Agile Epics &amp; Stories</text>
+    <text x="15" y="64" class="phase-desc">• Kanban Task Board</text>
+    <text x="15" y="80" class="phase-desc">• Sprint Backlog</text>
+    <rect x="12" y="94" width="111" height="18" rx="4" fill="#ffffff" opacity="0.9" />
+    <text x="67" y="106" class="phase-tool" text-anchor="middle">Jira / Markdown</text>
+  </g>
+
+  <!-- 2. CODE -->
+  <g transform="translate(290, 120)" filter="url(#cardShadow)">
+    <rect width="135" height="120" rx="10" fill="url(#codeGrad)" />
+    <text x="15" y="28" class="phase-title">2. CODE</text>
+    <text x="15" y="48" class="phase-desc">• Spring Boot 3 Web</text>
+    <text x="15" y="64" class="phase-desc">• JPA Data Entities</text>
+    <text x="15" y="80" class="phase-desc">• Git Branching</text>
+    <rect x="12" y="94" width="111" height="18" rx="4" fill="#ffffff" opacity="0.9" />
+    <text x="67" y="106" class="phase-tool" text-anchor="middle">Java 17 / Git / VS Code</text>
+  </g>
+
+  <!-- 3. BUILD -->
+  <g transform="translate(520, 120)" filter="url(#cardShadow)">
+    <rect width="135" height="120" rx="10" fill="url(#buildGrad)" />
+    <text x="15" y="28" class="phase-title">3. BUILD</text>
+    <text x="15" y="48" class="phase-desc">• Maven Compilation</text>
+    <text x="15" y="64" class="phase-desc">• Dependency Resolution</text>
+    <text x="15" y="80" class="phase-desc">• JAR Packaging</text>
+    <rect x="12" y="94" width="111" height="18" rx="4" fill="#ffffff" opacity="0.9" />
+    <text x="67" y="106" class="phase-tool" text-anchor="middle">Maven 3.9 / JDK 17</text>
+  </g>
+
+  <!-- 4. TEST -->
+  <g transform="translate(750, 120)" filter="url(#cardShadow)">
+    <rect width="135" height="120" rx="10" fill="url(#testGrad)" />
+    <text x="15" y="28" class="phase-title">4. TEST</text>
+    <text x="15" y="48" class="phase-desc">• JUnit 5 Unit Tests</text>
+    <text x="15" y="64" class="phase-desc">• Selenium E2E Tests</text>
+    <text x="15" y="80" class="phase-desc">• Surefire XML Reports</text>
+    <rect x="12" y="94" width="111" height="18" rx="4" fill="#ffffff" opacity="0.9" />
+    <text x="67" y="106" class="phase-tool" text-anchor="middle">JUnit 5 / Selenium</text>
+  </g>
+
+  <!-- 5. RELEASE -->
+  <g transform="translate(750, 270)" filter="url(#cardShadow)">
+    <rect width="135" height="120" rx="10" fill="url(#releaseGrad)" />
+    <text x="15" y="28" class="phase-title">5. RELEASE</text>
+    <text x="15" y="48" class="phase-desc">• Multi-stage Dockerfile</text>
+    <text x="15" y="64" class="phase-desc">• Non-root Security</text>
+    <text x="15" y="80" class="phase-desc">• Image Tagging (v1.0)</text>
+    <rect x="12" y="94" width="111" height="18" rx="4" fill="#ffffff" opacity="0.9" />
+    <text x="67" y="106" class="phase-tool" text-anchor="middle">Docker Engine</text>
+  </g>
+
+  <!-- 6. DEPLOY -->
+  <g transform="translate(520, 270)" filter="url(#cardShadow)">
+    <rect width="135" height="120" rx="10" fill="url(#deployGrad)" />
+    <text x="15" y="28" class="phase-title">6. DEPLOY</text>
+    <text x="15" y="48" class="phase-desc">• Automated Jenkins CI</text>
+    <text x="15" y="64" class="phase-desc">• Multi-Container Stack</text>
+    <text x="15" y="80" class="phase-desc">• Port 8081 Mapping</text>
+    <rect x="12" y="94" width="111" height="18" rx="4" fill="#ffffff" opacity="0.9" />
+    <text x="67" y="106" class="phase-tool" text-anchor="middle">Jenkins / Compose</text>
+  </g>
+
+  <!-- 7. OPERATE -->
+  <g transform="translate(290, 270)" filter="url(#cardShadow)">
+    <rect width="135" height="120" rx="10" fill="url(#operateGrad)" />
+    <text x="15" y="28" class="phase-title">7. OPERATE</text>
+    <text x="15" y="48" class="phase-desc">• PostgreSQL Service</text>
+    <text x="15" y="64" class="phase-desc">• Health Check Probes</text>
+    <text x="15" y="80" class="phase-desc">• Restart Policies</text>
+    <rect x="12" y="94" width="111" height="18" rx="4" fill="#ffffff" opacity="0.9" />
+    <text x="67" y="106" class="phase-tool" text-anchor="middle">PostgreSQL / Docker</text>
+  </g>
+
+  <!-- 8. MONITOR -->
+  <g transform="translate(60, 270)" filter="url(#cardShadow)">
+    <rect width="135" height="120" rx="10" fill="url(#monitorGrad)" />
+    <text x="15" y="28" class="phase-title">8. MONITOR</text>
+    <text x="15" y="48" class="phase-desc">• Container Inspection</text>
+    <text x="15" y="64" class="phase-desc">• Application Logs</text>
+    <text x="15" y="80" class="phase-desc">• Health Status Endpoint</text>
+    <rect x="12" y="94" width="111" height="18" rx="4" fill="#ffffff" opacity="0.9" />
+    <text x="67" y="106" class="phase-tool" text-anchor="middle">Docker Logs / Health API</text>
+  </g>
+
+  <!-- Footer Quality Bar -->
+  <rect x="50" y="425" width="900" height="42" rx="8" fill="#ffffff" stroke="#e2e8f0" stroke-width="1.5" />
+  <circle cx="75" cy="446" r="6" fill="#10b981" />
+  <text x="92" y="450" class="meta" font-weight="600" fill="#0f172a">Definition of Done (DoD) Quality Gate:</text>
+  <text x="325" y="450" class="meta" fill="#475569">Code Passed Tests (100%) • Multi-Stage Image Validated • Automated Pipeline Green • Screenshots Captured</text>
+</svg>

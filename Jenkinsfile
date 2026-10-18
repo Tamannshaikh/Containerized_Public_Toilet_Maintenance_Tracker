@@ -2,75 +2,90 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven-3.9'
-        jdk 'JDK-17'
+        // Matches configured installations in Jenkins Global Tool Configuration
+        maven 'Maven'
+        jdk 'JDK-21'
     }
 
     environment {
-        APP_NAME = 'containerized-public-toilet-maintenance-tracker'
-        DOCKER_REGISTRY = 'docker.io'
-        IMAGE_NAME = "toiletddevops/${APP_NAME}:${BUILD_NUMBER}"
+        APP_NAME = 'public-toilet-maintenance-tracker'
+        APP_VERSION = '1.0.0-SNAPSHOT'
+        JAR_NAME = "${APP_NAME}-${APP_VERSION}.jar"
     }
 
     stages {
         stage('Checkout') {
             steps {
-                echo 'Checking out source code from Git repository...'
+                echo '====================================================='
+                echo 'STAGE 1: Checking out source code from Git repository'
+                echo '====================================================='
                 checkout scm
             }
         }
 
-        stage('Code Compile & Unit Test') {
+        stage('Verify Environment') {
             steps {
-                echo 'Compiling source code and executing unit tests...'
-                bat 'mvn clean test'
+                echo '====================================================='
+                echo 'STAGE 2: Verifying Java and Maven runtime environment'
+                echo '====================================================='
+                bat 'java -version'
+                bat 'mvn -version'
+            }
+        }
+
+        stage('Compile') {
+            steps {
+                echo '====================================================='
+                echo 'STAGE 3: Compiling project source code'
+                echo '====================================================='
+                bat 'mvn clean compile'
+            }
+        }
+
+        stage('Run Automated Tests') {
+            steps {
+                echo '====================================================='
+                echo 'STAGE 4: Executing automated unit & integration tests'
+                echo '====================================================='
+                bat 'mvn test'
             }
         }
 
         stage('Package Application') {
             steps {
-                echo 'Packaging application artifact (JAR)...'
+                echo '====================================================='
+                echo 'STAGE 5: Packaging executable Spring Boot JAR'
+                echo '====================================================='
                 bat 'mvn package -DskipTests'
             }
-            post {
-                success {
-                    archiveArtifacts artifacts: 'target/*.jar', fingerprint: true
-                }
-            }
         }
 
-        stage('Selenium UI & Automated Testing') {
+        stage('Archive Artifacts') {
             steps {
-                echo 'Running Selenium automated acceptance and end-to-end tests...'
-                // bat 'mvn test -Dtest=*SeleniumTest'
-            }
-        }
-
-        stage('Docker Build') {
-            steps {
-                echo "Building Docker container image: ${IMAGE_NAME}"
-                bat "docker build -t ${IMAGE_NAME} ."
-            }
-        }
-
-        stage('Docker CD & Deployment') {
-            steps {
-                echo 'Deploying application stack via Docker Compose...'
-                bat 'docker compose up -d'
+                echo '====================================================='
+                echo 'STAGE 6: Archiving build artifacts for distribution'
+                echo '====================================================='
+                archiveArtifacts artifacts: 'target/*.jar', fingerprint: true, allowEmptyArchive: false
             }
         }
     }
 
     post {
         always {
-            echo 'Pipeline execution complete.'
+            echo 'Recording automated test results in JUnit format...'
             junit allowEmptyResults: true, testResults: 'target/surefire-reports/*.xml'
         }
         success {
-            echo 'Build, Test, and Deployment completed successfully!'
+            echo '====================================================='
+            echo "SUCCESS: Jenkins CI Pipeline for ${APP_NAME} completed successfully!"
+            echo "Archived Artifact: target/${JAR_NAME}"
+            echo '====================================================='
         }
         failure {
-            echo 'Pipeline failed! Please inspect logs.'
+            echo '====================================================='
+            echo "FAILURE: Jenkins CI Pipeline for ${APP_NAME} failed!"
+            echo 'Inspect the console output and surefire reports above.'
+            echo '====================================================='
         }
     }
 }

@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Containerized Public Toilet Maintenance Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #0b0f19;
+            --bg-surface: #111827;
+            --bg-card: rgba(17, 24, 39, 0.75);
+            --bg-card-hover: rgba(31, 41, 55, 0.85);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-accent: rgba(59, 130, 246, 0.3);
+            --text-primary: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-blue: #3b82f6;
+            --accent-teal: #06b6d4;
+            --accent-green: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --shadow-glow: 0 0 25px rgba(59, 130, 246, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-base);
+            color: var(--text-primary);
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(59, 130, 246, 0.12) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 92, 246, 0.10) 0%, transparent 45%);
+            background-attachment: fixed;
+            line-height: 1.5;
+        }
+
+        header {
+            background: rgba(11, 15, 25, 0.85);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #3b82f6, #06b6d4);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 4px 14px rgba(6, 182, 212, 0.3);
+        }
+
+        .brand-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            background: linear-gradient(to right, #fff, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-subtitle {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .academic-badge {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.85rem;
+            background: rgba(59, 130, 246, 0.12);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 9999px;
+            color: #93c5fd;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        main {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* KPI Summary Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .kpi-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            backdrop-filter: blur(8px);
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--border-accent);
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+        }
+
+        .kpi-blue::before { background: var(--accent-blue); }
+        .kpi-green::before { background: var(--accent-green); }
+        .kpi-amber::before { background: var(--accent-amber); }
+        .kpi-red::before { background: var(--accent-red); }
+
+        .kpi-title {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-value {
+            font-size: 2.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.03em;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .kpi-meta {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Nav Tabs */
+        .tab-bar {
+            display: flex;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            color: var(--accent-blue);
+            border-bottom-color: var(--accent-blue);
+        }
+
+        /* Filter Controls */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 1rem 1.25rem;
+            border-radius: var(--radius-md);
+            margin-bottom: 1.5rem;
+        }
+
+        .search-group {
+            display: flex;
+            gap: 0.75rem;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        input[type="text"], select, textarea {
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.6rem 0.9rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-family: inherit;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        input[type="text"]:focus, select:focus, textarea:focus {
+            border-color: var(--accent-blue);
+        }
+
+        .btn {
+            background: var(--accent-blue);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s ease, transform 0.1s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+        }
+
+        .btn-success { background: var(--accent-green); }
+        .btn-success:hover { background: #059669; }
+
+        .btn-danger { background: var(--accent-red); }
+        .btn-danger:hover { background: #dc2626; }
+
+        /* Tables */
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background: rgba(15, 23, 42, 0.9);
+            color: var(--text-secondary);
+            font-weight: 600;
+            padding: 0.85rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+        }
+
+        td {
+            padding: 1rem 1.25rem;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Status & Priority Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.25rem 0.65rem;
+            border-radius: 9999px;
+            font-size: 0.725rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+        }
+
+        .badge-open { background: rgba(59, 130, 246, 0.15); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-inprogress { background: rgba(245, 158, 11, 0.15); color: #fcd34d; border: 1px solid rgba(245, 158, 11, 0.3); }
+        .badge-resolved { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge-closed { background: rgba(107, 114, 128, 0.2); color: #d1d5db; border: 1px solid rgba(107, 114, 128, 0.3); }
+
+        .badge-critical { background: rgba(239, 68, 68, 0.2); color: #fca5a5; font-weight: 700; border: 1px solid rgba(239, 68, 68, 0.4); }
+        .badge-high { background: rgba(249, 115, 22, 0.2); color: #fdba74; border: 1px solid rgba(249, 115, 22, 0.4); }
+        .badge-medium { background: rgba(245, 158, 11, 0.15); color: #fcd34d; }
+        .badge-low { background: rgba(16, 185, 129, 0.15); color: #6ee7b7; }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            padding: 1.5rem;
+        }
+
+        .modal-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 600px;
+            padding: 2rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .form-grid {
+            display: grid;
+            gap: 1.25rem;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .alert-banner {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: var(--radius-md);
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: #fca5a5;
+            font-size: 0.875rem;
+        }
+
+        .view-section {
+            display: none;
+        }
+
+        .view-section.active {
+            display: block;
+        }
+
+        .clickable-row {
+            cursor: pointer;
+        }
+
+        .notification-toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: #1f2937;
+            border: 1px solid var(--accent-blue);
+            color: white;
+            padding: 0.85rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            display: none;
+            z-index: 200;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="brand-block">
+            <div class="brand-icon">🚽</div>
+            <div>
+                <div class="brand-title">Containerized Public Toilet Maintenance Tracker</div>
+                <div class="brand-subtitle">Municipal Sanitation & Hygiene Operations Platform (MVP Release)</div>
+            </div>
+        </div>
+        <div class="academic-badge">
+            Student: Tamanna Shaikh | Roll: 24102A2006 | VIT Mumbai
+        </div>
+    </header>
+
+    <main>
+        <!-- Alerts Banner if active exceptions exist -->
+        <div id="alertsBanner" class="alert-banner" style="display: none;">
+            <span style="font-size: 1.5rem;">⚠️</span>
+            <div>
+                <strong>Active Operational Exceptions Detected:</strong>
+                <span id="alertsBannerText">Loading alerts...</span>
+            </div>
+        </div>
+
+        <!-- 4 Core Summary Indicator Cards -->
+        <div class="kpi-grid">
+            <div class="kpi-card kpi-blue">
+                <div class="kpi-title">Total Facilities</div>
+                <div class="kpi-value" id="kpiTotalFacilities">-</div>
+                <div class="kpi-meta">
+                    <span id="kpiOperationalFacilities">-</span> Operational | <span id="kpiMaintFacilities">-</span> Attention
+                </div>
+            </div>
+
+            <div class="kpi-card kpi-amber">
+                <div class="kpi-title">Active Tickets</div>
+                <div class="kpi-value" id="kpiActiveTickets">-</div>
+                <div class="kpi-meta">
+                    <span id="kpiOpenTickets">-</span> Open | <span id="kpiInProgressTickets">-</span> In Progress
+                </div>
+            </div>
+
+            <div class="kpi-card kpi-red">
+                <div class="kpi-title">SLA Overdue / Breaches</div>
+                <div class="kpi-value" id="kpiOverdueTickets">-</div>
+                <div class="kpi-meta">
+                    <span id="kpiCriticalTickets">-</span> Critical Hazard Tickets
+                </div>
+            </div>
+
+            <div class="kpi-card kpi-green">
+                <div class="kpi-title">Cleanliness Score</div>
+                <div class="kpi-value" id="kpiCleanlinessScore">-%</div>
+                <div class="kpi-meta">
+                    <span id="kpiResolvedTickets">-</span> Resolved Remediation Tickets
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="tab-bar">
+            <button class="tab-btn active" onclick="switchTab('ticketsView')">Maintenance Tickets</button>
+            <button class="tab-btn" onclick="switchTab('facilitiesView')">Facility Directory</button>
+            <button class="tab-btn" onclick="switchTab('cleaningView')">Cleaning Shift Logs</button>
+            <button class="tab-btn" onclick="switchTab('alertsView')">Alerts & Exceptions</button>
+            <button class="tab-btn" onclick="openCreateTicketModal()" style="margin-left: auto; color: var(--accent-blue); font-weight: 700;">+ Log New Defect</button>
+            <button class="tab-btn" onclick="openCreateCleaningModal()" style="color: var(--accent-green); font-weight: 700;">+ Log Cleaning Shift</button>
+        </div>
+
+        <!-- VIEW 1: MAINTENANCE TICKETS (Searchable Dashboard) -->
+        <section id="ticketsView" class="view-section active">
+            <div class="toolbar">
+                <div class="search-group">
+                    <input type="text" id="ticketSearchInput" placeholder="Search ticket #, title, or facility..." onkeyup="filterTickets()">
+                    <select id="ticketStatusFilter" onchange="filterTickets()">
+                        <option value="">All Statuses</option>
+                        <option value="OPEN">OPEN</option>
+                        <option value="IN_PROGRESS">IN_PROGRESS</option>
+                        <option value="RESOLVED">RESOLVED</option>
+                        <option value="CLOSED">CLOSED</option>
+                    </select>
+                    <select id="ticketPriorityFilter" onchange="filterTickets()">
+                        <option value="">All Priorities</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                        <option value="HIGH">HIGH</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="LOW">LOW</option>
+                    </select>
+                </div>
+                <button class="btn btn-outline" onclick="loadDashboardData()">🔄 Refresh</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Ticket #</th>
+                            <th>Facility</th>
+                            <th>Ward</th>
+                            <th>Issue Title</th>
+                            <th>Priority</th>
+                            <th>Status</th>
+                            <th>Reported By</th>
+                            <th>Created At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ticketsTableBody">
+                        <tr><td colspan="9" style="text-align: center; color: var(--text-muted);">Loading tickets...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- VIEW 2: FACILITY DIRECTORY -->
+        <section id="facilitiesView" class="view-section">
+            <div class="toolbar">
+                <div class="search-group">
+                    <input type="text" id="facilitySearchInput" placeholder="Search facility name or code..." onkeyup="filterFacilities()">
+                    <select id="facilityWardFilter" onchange="filterFacilities()">
+                        <option value="">All Wards</option>
+                        <option value="G/North">G/North (Dadar)</option>
+                        <option value="H/West">H/West (Bandra)</option>
+                        <option value="K/East">K/East (Andheri)</option>
+                    </select>
+                </div>
+                <button class="btn btn-outline" onclick="loadFacilities()">🔄 Refresh</button>
+            </div>
+
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Code</th>
+                            <th>Facility Name</th>
+                            <th>Ward</th>
+                            <th>Cabins</th>
+                            <th>Running Water</th>
+                            <th>Hygiene Score</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="facilitiesTableBody">
+                        <tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Loading facilities...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- VIEW 3: CLEANING SHIFT LOGS -->
+        <section id="cleaningView" class="view-section">
+            <div class="toolbar">
+                <div class="brand-subtitle">Official shift logs submitted by sanitation crew</div>
+                <button class="btn btn-outline" onclick="loadCleaningLogs()">🔄 Refresh</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Log ID</th>
+                            <th>Facility</th>
+                            <th>Cleaner Staff</th>
+                            <th>Water Supply</th>
+                            <th>Soap Stock</th>
+                            <th>Rating</th>
+                            <th>Timestamp</th>
+                            <th>Remarks</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cleaningTableBody">
+                        <tr><td colspan="8" style="text-align: center; color: var(--text-muted);">Loading cleaning logs...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- VIEW 4: ALERTS & EXCEPTIONS -->
+        <section id="alertsView" class="view-section">
+            <div class="toolbar">
+                <div class="brand-subtitle">Overdue SLA resolution tickets (> 4h critical) and sanitation water outages</div>
+                <button class="btn btn-outline" onclick="loadAlerts()">🔄 Refresh</button>
+            </div>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Identifier</th>
+                            <th>Ward / Facility</th>
+                            <th>Details</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="alertsTableBody">
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Loading exceptions...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL 1: STATUS DRILL-DOWN MODAL -->
+    <div id="ticketDetailModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <div>
+                    <h3 id="modalTicketNumber" style="font-size: 1.25rem;">TKT-20261018-001</h3>
+                    <span id="modalTicketStatusBadge" class="badge badge-open">OPEN</span>
+                </div>
+                <button class="btn btn-outline" onclick="closeModal('ticketDetailModal')">✕</button>
+            </div>
+            <div class="form-grid">
+                <div>
+                    <label>Facility</label>
+                    <div id="modalFacility" style="font-weight: 600; color: white;">-</div>
+                </div>
+                <div>
+                    <label>Ward & Location</label>
+                    <div id="modalLocation" style="color: var(--text-secondary); font-size: 0.875rem;">-</div>
+                </div>
+                <div>
+                    <label>Issue Title</label>
+                    <div id="modalTitle" style="font-weight: 600; font-size: 1.05rem; color: white;">-</div>
+                </div>
+                <div>
+                    <label>Description</label>
+                    <div id="modalDescription" style="color: var(--text-secondary); font-size: 0.875rem; background: rgba(0,0,0,0.25); padding: 0.75rem; border-radius: 8px;">-</div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label>Priority</label>
+                        <div id="modalPriority">-</div>
+                    </div>
+                    <div>
+                        <label>Reported By</label>
+                        <div id="modalReporter">-</div>
+                    </div>
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div>
+                        <label>Created Timestamp</label>
+                        <div id="modalCreatedAt" style="font-size: 0.8rem; color: var(--text-muted);">-</div>
+                    </div>
+                    <div>
+                        <label>Resolved Timestamp</label>
+                        <div id="modalResolvedAt" style="font-size: 0.8rem; color: var(--text-muted);">-</div>
+                    </div>
+                </div>
+
+                <!-- Status Transition Action Buttons -->
+                <div style="margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <label style="margin-bottom: 0.5rem; display: block;">Update Ticket Lifecycle State</label>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="btn" onclick="transitionStatus('IN_PROGRESS')">▶ Start Work</button>
+                        <button class="btn btn-success" onclick="transitionStatus('RESOLVED')">✓ Mark Resolved</button>
+                        <button class="btn btn-outline" onclick="transitionStatus('CLOSED')">🔒 Close Ticket</button>
+                        <button class="btn btn-outline" onclick="transitionStatus('OPEN')">↺ Reopen</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: CREATE TICKET MODAL -->
+    <div id="createTicketModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Log Sanitation Maintenance Ticket</h3>
+                <button class="btn btn-outline" onclick="closeModal('createTicketModal')">✕</button>
+            </div>
+            <form id="createTicketForm" onsubmit="submitNewTicket(event)">
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label for="createTicketFacility">Target Public Toilet Facility *</label>
+                        <select id="createTicketFacility" required>
+                            <option value="">Select Facility...</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="createTicketTitle">Issue Title *</label>
+                        <input type="text" id="createTicketTitle" placeholder="e.g. Broken flush handle in cabin 2" required>
+                    </div>
+                    <div class="form-row">
+                        <label for="createTicketDesc">Detailed Description *</label>
+                        <textarea id="createTicketDesc" rows="3" placeholder="Provide operational details for technician dispatch..." required></textarea>
+                    </div>
+                    <div class="form-row">
+                        <label for="createTicketPriority">Priority Level *</label>
+                        <select id="createTicketPriority" required>
+                            <option value="LOW">LOW (Non-urgent routine maintenance)</option>
+                            <option value="MEDIUM" selected>MEDIUM (Standard repair)</option>
+                            <option value="HIGH">HIGH (Partial disruption / leakage)</option>
+                            <option value="CRITICAL">CRITICAL (Water outage / sanitary hazard)</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="createTicketReporter">Reporter Identification</label>
+                        <input type="text" id="createTicketReporter" placeholder="Citizen Name or Inspector ID" value="Citizen Suresh P.">
+                    </div>
+                    <button type="submit" class="btn" style="width: 100%; justify-content: center; margin-top: 0.5rem;">Submit Ticket</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 3: CREATE CLEANING LOG MODAL -->
+    <div id="createCleaningModal" class="modal-overlay">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3>Record Completed Cleaning Shift</h3>
+                <button class="btn btn-outline" onclick="closeModal('createCleaningModal')">✕</button>
+            </div>
+            <form id="createCleaningForm" onsubmit="submitCleaningLog(event)">
+                <div class="form-grid">
+                    <div class="form-row">
+                        <label for="cleanFacility">Public Toilet Facility *</label>
+                        <select id="cleanFacility" required>
+                            <option value="">Select Facility...</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="cleanerName">Sanitation Staff Name *</label>
+                        <input type="text" id="cleanerName" placeholder="Staff Name" value="Ramesh Patil" required>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="cleanWater" checked> Running Water Available
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                            <input type="checkbox" id="cleanSoap" checked> Soap Restocked
+                        </label>
+                    </div>
+                    <div class="form-row">
+                        <label for="cleanRating">Hygiene Score (1 = Poor, 5 = Excellent) *</label>
+                        <select id="cleanRating" required>
+                            <option value="5">⭐⭐⭐⭐⭐ 5 - Spotless & Sanitized</option>
+                            <option value="4" selected>⭐⭐⭐⭐ 4 - Clean & Stocked</option>
+                            <option value="3">⭐⭐⭐ 3 - Fair</option>
+                            <option value="2">⭐⭐ 2 - Requires Attention</option>
+                            <option value="1">⭐ 1 - Critical Hygiene Failure</option>
+                        </select>
+                    </div>
+                    <div class="form-row">
+                        <label for="cleanRemarks">Remarks / Notes</label>
+                        <input type="text" id="cleanRemarks" placeholder="Disinfection cycle completed, floors scrubbed">
+                    </div>
+                    <button type="submit" class="btn btn-success" style="width: 100%; justify-content: center; margin-top: 0.5rem;">Submit Cleaning Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="notification-toast">Action Completed</div>
+
+    <script>
+        let currentTickets = [];
+        let currentFacilities = [];
+        let selectedTicketId = null;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardData();
+        });
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        function switchTab(viewId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.view-section').forEach(sec => sec.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(viewId).classList.add('active');
+            if (viewId === 'facilitiesView') loadFacilities();
+            if (viewId === 'cleaningView') loadCleaningLogs();
+            if (viewId === 'alertsView') loadAlerts();
+        }
+
+        async function loadDashboardData() {
+            await Promise.all([loadSummary(), loadTickets(), loadFacilities()]);
+        }
+
+        async function loadSummary() {
+            try {
+                const res = await fetch('/api/v1/dashboard/summary');
+                if (res.ok) {
+                    const data = await res.json();
+                    document.getElementById('kpiTotalFacilities').innerText = data.totalFacilities;
+                    document.getElementById('kpiOperationalFacilities').innerText = data.operationalFacilities;
+                    document.getElementById('kpiMaintFacilities').innerText = data.maintenanceRequiredFacilities;
+                    document.getElementById('kpiActiveTickets').innerText = data.openTickets + data.inProgressTickets;
+                    document.getElementById('kpiOpenTickets').innerText = data.openTickets;
+                    document.getElementById('kpiInProgressTickets').innerText = data.inProgressTickets;
+                    document.getElementById('kpiOverdueTickets').innerText = data.overdueTickets;
+                    document.getElementById('kpiCriticalTickets').innerText = data.criticalTickets;
+                    document.getElementById('kpiCleanlinessScore').innerText = data.averageCleanlinessScore + '%';
+                    document.getElementById('kpiResolvedTickets').innerText = data.resolvedTickets;
+                }
+            } catch (err) {
+                console.error('Error loading summary:', err);
+            }
+        }
+
+        async function loadTickets() {
+            try {
+                const res = await fetch('/api/v1/tickets');
+                if (res.ok) {
+                    currentTickets = await res.json();
+                    renderTickets(currentTickets);
+                }
+            } catch (err) {
+                console.error('Error loading tickets:', err);
+            }
+        }
+
+        function renderTickets(tickets) {
+            const tbody = document.getElementById('ticketsTableBody');
+            if (tickets.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: var(--text-muted);">No maintenance tickets match criteria.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = tickets.map(t => `
+                <tr class="clickable-row" onclick="openTicketDetail(${t.id})">
+                    <td style="font-family: 'JetBrains Mono', monospace; font-weight: 600; color: #93c5fd;">${t.ticketNumber}</td>
+                    <td><strong>${t.facilityName || 'Facility #' + t.facilityId}</strong></td>
+                    <td><span class="badge" style="background: rgba(255,255,255,0.06);">${t.ward || '-'}</span></td>
+                    <td>${escapeHtml(t.title)}</td>
+                    <td><span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span></td>
+                    <td><span class="badge badge-${t.status.toLowerCase().replace('_','')}">${t.status}</span></td>
+                    <td style="color: var(--text-secondary); font-size: 0.8rem;">${escapeHtml(t.reportedBy || 'Citizen')}</td>
+                    <td style="color: var(--text-muted); font-size: 0.75rem;">${formatDate(t.createdAt)}</td>
+                    <td><button class="btn btn-outline" style="padding: 0.25rem 0.6rem; font-size: 0.75rem;" onclick="event.stopPropagation(); openTicketDetail(${t.id})">Drill Down</button></td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadFacilities() {
+            try {
+                const res = await fetch('/api/v1/facilities');
+                if (res.ok) {
+                    currentFacilities = await res.json();
+                    renderFacilities(currentFacilities);
+                    populateFacilityDropdowns(currentFacilities);
+                }
+            } catch (err) {
+                console.error('Error loading facilities:', err);
+            }
+        }
+
+        function renderFacilities(facilities) {
+            const tbody = document.getElementById('facilitiesTableBody');
+            if (facilities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">No facilities found.</td></tr>';
+                return;
+            }
+            tbody.innerHTML = facilities.map(f => `
+                <tr>
+                    <td style="font-family: 'JetBrains Mono', monospace; color: #93c5fd;">${f.facilityCode}</td>
+                    <td><strong>${escapeHtml(f.name)}</strong><br><small style="color: var(--text-muted);">${escapeHtml(f.locationAddress || '')}</small></td>
+                    <td><span class="badge" style="background: rgba(255,255,255,0.08);">${f.ward}</span></td>
+                    <td>${f.totalCabins} Cabins</td>
+                    <td>${f.hasRunningWater ? '<span style="color: var(--accent-green);">● Yes</span>' : '<span style="color: var(--accent-red);">● Outage</span>'}</td>
+                    <td><strong>${f.cleanlinessScore}%</strong></td>
+                    <td><span class="badge ${f.operationalStatus === 'OPERATIONAL' ? 'badge-resolved' : 'badge-inprogress'}">${f.operationalStatus}</span></td>
+                </tr>
+            `).join('');
+        }
+
+        function populateFacilityDropdowns(facilities) {
+            const ticketSelect = document.getElementById('createTicketFacility');
+            const cleanSelect = document.getElementById('cleanFacility');
+            const options = '<option value="">Select Facility...</option>' + 
+                facilities.map(f => `<option value="${f.id}">${f.facilityCode} - ${f.name} (Ward ${f.ward})</option>`).join('');
+            if (ticketSelect) ticketSelect.innerHTML = options;
+            if (cleanSelect) cleanSelect.innerHTML = options;
+        }
+
+        async function loadCleaningLogs() {
+            try {
+                const res = await fetch('/api/v1/cleaning-logs');
+                if (res.ok) {
+                    const logs = await res.json();
+                    const tbody = document.getElementById('cleaningTableBody');
+                    if (logs.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: var(--text-muted);">No cleaning shifts recorded yet.</td></tr>';
+                        return;
+                    }
+                    tbody.innerHTML = logs.map(l => `
+                        <tr>
+                            <td style="font-family: 'JetBrains Mono';">#${l.id}</td>
+                            <td><strong>${l.facilityName}</strong> (${l.ward})</td>
+                            <td>${escapeHtml(l.cleanerName)}</td>
+                            <td>${l.waterSupplied ? '✅ Supplied' : '❌ Outage'}</td>
+                            <td>${l.soapAvailable ? '✅ In Stock' : '❌ Depleted'}</td>
+                            <td>⭐ ${l.hygieneRating}/5</td>
+                            <td style="font-size: 0.75rem; color: var(--text-muted);">${formatDate(l.cleanedAt)}</td>
+                            <td>${escapeHtml(l.remarks || '-')}</td>
+                        </tr>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Error loading cleaning logs:', err);
+            }
+        }
+
+        async function loadAlerts() {
+            try {
+                const res = await fetch('/api/v1/alerts/exceptions');
+                if (res.ok) {
+                    const data = await res.json();
+                    const banner = document.getElementById('alertsBanner');
+                    if (data.totalAlertsCount > 0) {
+                        banner.style.display = 'flex';
+                        document.getElementById('alertsBannerText').innerText = 
+                            `${data.overdueTickets.length} SLA Overdue Tickets | ${data.waterOutageFacilities.length} Water Outages | ${data.lowHygieneFacilities.length} Low Hygiene Flags.`;
+                    } else {
+                        banner.style.display = 'none';
+                    }
+
+                    const tbody = document.getElementById('alertsTableBody');
+                    let rows = [];
+                    data.overdueTickets.forEach(t => {
+                        rows.push(`
+                            <tr>
+                                <td><span class="badge badge-critical">SLA OVERDUE</span></td>
+                                <td style="font-family: 'JetBrains Mono';">${t.ticketNumber}</td>
+                                <td>${t.facilityName} (Ward ${t.ward})</td>
+                                <td>${escapeHtml(t.title)} (Priority: ${t.priority})</td>
+                                <td><span class="badge badge-inprogress">${t.status}</span></td>
+                            </tr>
+                        `);
+                    });
+                    data.waterOutageFacilities.forEach(f => {
+                        rows.push(`
+                            <tr>
+                                <td><span class="badge badge-critical">WATER OUTAGE</span></td>
+                                <td style="font-family: 'JetBrains Mono';">${f.facilityCode}</td>
+                                <td>${f.name} (Ward ${f.ward})</td>
+                                <td>Zero running water reported in facility. Sanitary hazard.</td>
+                                <td><span class="badge badge-inprogress">${f.operationalStatus}</span></td>
+                            </tr>
+                        `);
+                    });
+                    data.lowHygieneFacilities.forEach(f => {
+                        rows.push(`
+                            <tr>
+                                <td><span class="badge badge-high">LOW HYGIENE</span></td>
+                                <td style="font-family: 'JetBrains Mono';">${f.facilityCode}</td>
+                                <td>${f.name} (Ward ${f.ward})</td>
+                                <td>Cleanliness score dropped to ${f.cleanlinessScore}% (< 60% threshold).</td>
+                                <td><span class="badge badge-inprogress">${f.operationalStatus}</span></td>
+                            </tr>
+                        `);
+                    });
+
+                    if (rows.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--accent-green);">✓ All facilities normal. No SLA exceptions or water hazards active.</td></tr>';
+                    } else {
+                        tbody.innerHTML = rows.join('');
+                    }
+                }
+            } catch (err) {
+                console.error('Error loading alerts:', err);
+            }
+        }
+
+        async function openTicketDetail(id) {
+            selectedTicketId = id;
+            try {
+                const res = await fetch('/api/v1/tickets/' + id);
+                if (res.ok) {
+                    const t = await res.json();
+                    document.getElementById('modalTicketNumber').innerText = t.ticketNumber;
+                    document.getElementById('modalTicketStatusBadge').className = 'badge badge-' + t.status.toLowerCase().replace('_','');
+                    document.getElementById('modalTicketStatusBadge').innerText = t.status;
+                    document.getElementById('modalFacility').innerText = t.facilityName + ' (' + (t.facilityCode || '') + ')';
+                    document.getElementById('modalLocation').innerText = 'Ward: ' + (t.ward || 'N/A');
+                    document.getElementById('modalTitle').innerText = t.title;
+                    document.getElementById('modalDescription').innerText = t.description;
+                    document.getElementById('modalPriority').innerHTML = `<span class="badge badge-${t.priority.toLowerCase()}">${t.priority}</span>`;
+                    document.getElementById('modalReporter').innerText = t.reportedBy || 'Citizen';
+                    document.getElementById('modalCreatedAt').innerText = formatDate(t.createdAt);
+                    document.getElementById('modalResolvedAt').innerText = t.resolvedAt ? formatDate(t.resolvedAt) : 'Pending Resolution';
+
+                    document.getElementById('ticketDetailModal').style.display = 'flex';
+                }
+            } catch (err) {
+                console.error('Error loading ticket detail:', err);
+            }
+        }
+
+        async function transitionStatus(newStatus) {
+            if (!selectedTicketId) return;
+            try {
+                const res = await fetch(`/api/v1/tickets/${selectedTicketId}/status?status=${newStatus}`, {
+                    method: 'PATCH'
+                });
+                if (res.ok) {
+                    showToast(`Ticket status updated to ${newStatus}`);
+                    closeModal('ticketDetailModal');
+                    loadDashboardData();
+                } else {
+                    const err = await res.json();
+                    alert(`Transition Rejected: ${err.message}`);
+                }
+            } catch (err) {
+                alert('Network error updating status');
+            }
+        }
+
+        async function submitNewTicket(event) {
+            event.preventDefault();
+            const payload = {
+                facilityId: parseInt(document.getElementById('createTicketFacility').value),
+                title: document.getElementById('createTicketTitle').value,
+                description: document.getElementById('createTicketDesc').value,
+                priority: document.getElementById('createTicketPriority').value,
+                reportedBy: document.getElementById('createTicketReporter').value
+            };
+            try {
+                const res = await fetch('/api/v1/tickets', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    showToast('Maintenance Ticket logged successfully!');
+                    closeModal('createTicketModal');
+                    document.getElementById('createTicketForm').reset();
+                    loadDashboardData();
+                } else {
+                    const err = await res.json();
+                    alert(`Error: ${err.message}`);
+                }
+            } catch (err) {
+                alert('Network error submitting ticket');
+            }
+        }
+
+        async function submitCleaningLog(event) {
+            event.preventDefault();
+            const payload = {
+                facilityId: parseInt(document.getElementById('cleanFacility').value),
+                cleanerName: document.getElementById('cleanerName').value,
+                waterSupplied: document.getElementById('cleanWater').checked,
+                soapAvailable: document.getElementById('cleanSoap').checked,
+                hygieneRating: parseInt(document.getElementById('cleanRating').value),
+                remarks: document.getElementById('cleanRemarks').value
+            };
+            try {
+                const res = await fetch('/api/v1/cleaning-logs', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (res.ok) {
+                    showToast('Cleaning shift recorded!');
+                    closeModal('createCleaningModal');
+                    document.getElementById('createCleaningForm').reset();
+                    loadDashboardData();
+                } else {
+                    const err = await res.json();
+                    alert(`Error: ${err.message}`);
+                }
+            } catch (err) {
+                alert('Network error submitting cleaning log');
+            }
+        }
+
+        function filterTickets() {
+            const search = document.getElementById('ticketSearchInput').value.toLowerCase();
+            const status = document.getElementById('ticketStatusFilter').value;
+            const priority = document.getElementById('ticketPriorityFilter').value;
+
+            const filtered = currentTickets.filter(t => {
+                const matchSearch = !search || 
+                    (t.title && t.title.toLowerCase().includes(search)) ||
+                    (t.ticketNumber && t.ticketNumber.toLowerCase().includes(search)) ||
+                    (t.facilityName && t.facilityName.toLowerCase().includes(search));
+                const matchStatus = !status || t.status === status;
+                const matchPriority = !priority || t.priority === priority;
+                return matchSearch && matchStatus && matchPriority;
+            });
+            renderTickets(filtered);
+        }
+
+        function filterFacilities() {
+            const search = document.getElementById('facilitySearchInput').value.toLowerCase();
+            const ward = document.getElementById('facilityWardFilter').value;
+
+            const filtered = currentFacilities.filter(f => {
+                const matchSearch = !search || 
+                    (f.name && f.name.toLowerCase().includes(search)) ||
+                    (f.facilityCode && f.facilityCode.toLowerCase().includes(search));
+                const matchWard = !ward || f.ward === ward;
+                return matchSearch && matchWard;
+            });
+            renderFacilities(filtered);
+        }
+
+        function openCreateTicketModal() { document.getElementById('createTicketModal').style.display = 'flex'; }
+        function openCreateCleaningModal() { document.getElementById('createCleaningModal').style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+        function formatDate(dtStr) {
+            if (!dtStr) return '-';
+            const d = new Date(dtStr);
+            return d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+    </script>
+</body>
+</html>
