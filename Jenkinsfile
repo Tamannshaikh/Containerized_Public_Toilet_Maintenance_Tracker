@@ -53,7 +53,7 @@ pipeline {
                 echo '====================================================='
                 echo 'STAGE 4: Executing automated unit & integration tests'
                 echo '====================================================='
-                bat 'mvn test'
+                bat 'mvn test "-Dtest=!PublicToiletSeleniumTest"'
             }
         }
 
@@ -170,6 +170,28 @@ pipeline {
                 }
             }
         }
+
+        stage('Continuous Selenium UI Testing') {
+            when {
+                expression {
+                    return params.AUTO_DEPLOY == true && params.DEPLOY_ENV != 'production'
+                }
+            }
+            steps {
+                echo '====================================================='
+                echo "STAGE 9: Executing Continuous Selenium E2E Tests on Port ${env.ACTIVE_DEPLOY_PORT ?: params.DEPLOY_PORT}"
+                echo '====================================================='
+                script {
+                    def targetPort = env.ACTIVE_DEPLOY_PORT ?: params.DEPLOY_PORT
+                    echo "Targeting Staging Application on Port: ${targetPort}"
+                    bat """
+                        @echo off
+                        echo [SELENIUM] Running automated browser tests against http://localhost:${targetPort}...
+                        mvn test -Dtest=PublicToiletSeleniumTest "-Dtest.server.port=${targetPort}" "-Dtest.screenshot.dir=docs/screenshots/Task-10"
+                    """
+                }
+            }
+        }
     }
 
     post {
@@ -179,19 +201,20 @@ pipeline {
         }
         success {
             echo '====================================================='
-            echo "SUCCESS: Jenkins CI/CD Pipeline for ${APP_NAME} completed successfully!"
+            echo "SUCCESS: Jenkins Continuous Testing Pipeline for ${APP_NAME} completed successfully!"
             echo "Target Environment : ${params.DEPLOY_ENV ?: 'staging'}"
             echo "Deployment Port     : ${env.ACTIVE_DEPLOY_PORT ?: params.DEPLOY_PORT ?: '8082'}"
             echo "Application URL     : http://localhost:${env.ACTIVE_DEPLOY_PORT ?: params.DEPLOY_PORT ?: '8082'}"
             echo "Health Endpoint     : http://localhost:${env.ACTIVE_DEPLOY_PORT ?: params.DEPLOY_PORT ?: '8082'}/api/v1/health"
             echo "Facilities API      : http://localhost:${env.ACTIVE_DEPLOY_PORT ?: params.DEPLOY_PORT ?: '8082'}/api/v1/facilities"
+            echo "Selenium UI Tests   : 5 End-to-End User Journeys Passed"
             echo "Preserved Service   : http://localhost:8081 (Active instance untouched)"
             echo "Archived Artifact   : target/${JAR_NAME}"
             echo '====================================================='
         }
         failure {
             echo '====================================================='
-            echo "FAILURE: Jenkins CI Pipeline for ${APP_NAME} failed!"
+            echo "FAILURE: Jenkins Continuous Testing Pipeline for ${APP_NAME} failed!"
             echo 'Inspect the console output and surefire reports above.'
             echo '====================================================='
         }

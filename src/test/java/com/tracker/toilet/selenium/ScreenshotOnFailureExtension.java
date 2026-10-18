@@ -28,7 +28,9 @@ import java.util.Optional;
  */
 public class ScreenshotOnFailureExtension implements AfterTestExecutionCallback, TestWatcher {
 
-    private static final String SCREENSHOT_DIR = "docs/screenshots/Task-09";
+    private static String getScreenshotDir() {
+        return System.getProperty("test.screenshot.dir", "docs/screenshots/Task-09");
+    }
     private static final DateTimeFormatter TIMESTAMP_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss");
 
     @Override
@@ -49,7 +51,7 @@ public class ScreenshotOnFailureExtension implements AfterTestExecutionCallback,
             WebDriver driver = ((PublicToiletSeleniumTest) testInstance.get()).getDriver();
             if (driver != null && driver instanceof TakesScreenshot) {
                 try {
-                    Path dirPath = Paths.get(SCREENSHOT_DIR);
+                    Path dirPath = Paths.get(getScreenshotDir());
                     if (!Files.exists(dirPath)) {
                         Files.createDirectories(dirPath);
                     }

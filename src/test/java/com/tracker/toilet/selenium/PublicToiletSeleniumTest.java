@@ -42,7 +42,9 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class PublicToiletSeleniumTest {
 
-    private static final String SCREENSHOT_DIR = "docs/screenshots/Task-09";
+    public static String getScreenshotDir() {
+        return System.getProperty("test.screenshot.dir", "docs/screenshots/Task-09");
+    }
     private static String baseUrl;
     private static int targetPort = 8081;
 
@@ -79,7 +81,7 @@ public class PublicToiletSeleniumTest {
 
         // Ensure screenshot directory exists
         try {
-            Files.createDirectories(Paths.get(SCREENSHOT_DIR));
+            Files.createDirectories(Paths.get(getScreenshotDir()));
         } catch (IOException e) {
             System.err.println("[SELENIUM] Could not create screenshot directory: " + e.getMessage());
         }
@@ -111,7 +113,7 @@ public class PublicToiletSeleniumTest {
     }
 
     private WebDriver initializeWebDriver() {
-        // Attempt Chrome initialization first
+        // Attempt Chrome initialization first via Selenium Manager
         try {
             ChromeOptions chromeOptions = new ChromeOptions();
             chromeOptions.addArguments("--headless=new");
@@ -152,13 +154,17 @@ public class PublicToiletSeleniumTest {
     }
 
     /**
-     * Helper to capture visual checkpoint evidence for the Task 09 academic report.
+     * Helper to capture visual checkpoint evidence for the academic report.
      */
     public void captureCheckpoint(String checkpointName) {
         if (driver instanceof TakesScreenshot) {
             try {
                 byte[] bytes = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
-                File file = Paths.get(SCREENSHOT_DIR, checkpointName + ".png").toFile();
+                String fileName = checkpointName;
+                if (getScreenshotDir().contains("Task-10") && fileName.startsWith("task09")) {
+                    fileName = fileName.replace("task09", "task10");
+                }
+                File file = Paths.get(getScreenshotDir(), fileName + ".png").toFile();
                 try (FileOutputStream fos = new FileOutputStream(file)) {
                     fos.write(bytes);
                 }
