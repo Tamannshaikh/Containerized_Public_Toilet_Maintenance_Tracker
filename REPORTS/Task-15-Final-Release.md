@@ -23,7 +23,7 @@ Task 15 represents the culmination and formal academic release audit for the **C
 3. **CI/CD & Continuous Testing (Tasks 07–10):** Native Jenkins service on port `8080`, declarative pipeline ([`Jenkinsfile`](../Jenkinsfile)), automated staging deployments (port `8082`), and 5 headless Selenium UI test journeys.
 4. **Containerization & Orchestration (Tasks 11–12):** Multi-stage build ([`Dockerfile`](../Dockerfile)), unprivileged user execution (`USER appuser`), and multi-container Docker Compose stack ([`docker-compose.yml`](../docker-compose.yml)) with named volume persistence (`pgdata`).
 5. **Configuration Management & Reliability (Tasks 13–14):** Ansible-driven configuration audit and drift detection, Spring profile segregation (`dev`/`docker`), `json-file` log rotation (`10m`/`3`), and automated non-destructive database backup/restore verification ([`scripts/backup-db.ps1`](../scripts/backup-db.ps1), [`scripts/restore-db.ps1`](../scripts/restore-db.ps1)).
-6. **Final Release Audit (Task 15):** Comprehensive verification matrix, evidence catalog (51 verified screenshots), security audit, retrospective, and viva defense guide.
+6. **Final Release Audit (Task 15):** Comprehensive verification matrix, evidence catalog (60 verified screenshots), security audit, retrospective, and viva defense guide.
 
 ---
 
@@ -35,7 +35,7 @@ Task 15 represents the culmination and formal academic release audit for the **C
 - **Runtime Stack Health:** Both `public-toilet-app` and `public-toilet-db` reporting healthy status on port `8085` and `5432`.
 - **Relational Data Durability:** Test ticket `TKT-20261019-9F7207` verified intact in PostgreSQL volume `pgdata`.
 - **Disaster Recovery Proof:** Automated database restore verified into isolated temporary database `toilet_tracker_verify_db` with zero live data risk.
-- **Visual Evidence Catalog:** Exactly 51 physical screenshots mapped across Tasks 09–14 in [`docs/screenshots/`](../docs/screenshots/).
+- **Visual Evidence Catalog:** Exactly 60 physical screenshots mapped across Tasks 09–15 (51 historical + 9 Task 15 final release) in [`docs/screenshots/`](../docs/screenshots/).
 
 ---
 
