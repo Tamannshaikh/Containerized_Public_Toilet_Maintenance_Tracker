@@ -25,4 +25,7 @@ COPY --from=builder /workspace/target/*.jar app.jar
 
 EXPOSE 8081
 
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD wget -q --spider http://localhost:8081/api/v1/health || exit 1
+
 ENTRYPOINT ["java", "-jar", "app.jar"]

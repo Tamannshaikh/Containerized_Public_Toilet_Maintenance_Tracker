@@ -1,0 +1,19 @@
+# Git and version control
+.git
+.github
+.gitignore
+
+# IDE & Editor artifacts
+.vscode
+
+# Build output and deployment staging
+target/
+deploy/
+
+# Academic documentation and screenshots
+docs/
+REPORTS/
+*.md
+
+# Datasets and misc
+datasets/
