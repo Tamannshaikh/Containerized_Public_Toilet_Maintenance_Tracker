@@ -1,0 +1,302 @@
+---
+# ==============================================================================
+# Ansible Configuration Management & Environment Drift Audit Playbook
+# Project: Containerized Public Toilet Maintenance Tracker
+# Task 13: Configuration Management & Environment Drift
+#
+# Idempotent, non-destructive audit playbook for configuration baselines,
+# profile segregation, Docker stack health, port status, and drift detection.
+# ==============================================================================
+
+- name: Task 13 - Configuration Management & Environment Drift Audit
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  vars:
+    project_root: "{{ playbook_dir }}/.."
+    audit_env_file: "{{ project_root }}/.env"
+    expected_app_port: "8085"
+    expected_db_port: "5432"
+    expected_jenkins_port: "8080"
+    expected_db_name: "toilet_tracker_db"
+    expected_app_profile: "docker"
+    expected_ticket_number: "TKT-20261019-9F7207"
+
+    required_project_files:
+      - "{{ project_root }}/pom.xml"
+      - "{{ project_root }}/Dockerfile"
+      - "{{ project_root }}/docker-compose.yml"
+      - "{{ project_root }}/.env.example"
+      - "{{ project_root }}/src/main/resources/application.properties"
+      - "{{ project_root }}/src/main/resources/application-dev.properties"
+      - "{{ project_root }}/src/main/resources/application-docker.properties"
+
+  tasks:
+    # --------------------------------------------------------------------------
+    # 1. Core Project Files & Structure Verification
+    # --------------------------------------------------------------------------
+    - name: "1.1 Check presence of required project configuration files"
+      ansible.builtin.stat:
+        path: "{{ item }}"
+      loop: "{{ required_project_files }}"
+      loop_control:
+        label: "{{ item | basename }}"
+      register: project_files_stat
+
+    - name: "1.2 Assert all core project configuration files exist"
+      ansible.builtin.assert:
+        that:
+          - item.stat.exists
+        quiet: true
+        fail_msg: "Required configuration file is missing: {{ item.item }}"
+        success_msg: "Verified configuration file exists: {{ item.item | basename }}"
+      loop: "{{ project_files_stat.results }}"
+      loop_control:
+        label: "{{ item.item | basename }}"
+
+    # --------------------------------------------------------------------------
+    # 2. Security & Secrets Isolation Audit
+    # --------------------------------------------------------------------------
+    - name: "2.1 Audit local .env file existence (zero secret disclosure)"
+      ansible.builtin.stat:
+        path: "{{ project_root }}/.env"
+      register: local_env_stat
+
+    - name: "2.2 Assert local .env exists"
+      ansible.builtin.assert:
+        that:
+          - local_env_stat.stat.exists
+        quiet: true
+        fail_msg: "Local environment file .env is missing. Create one from .env.example."
+        success_msg: "Verified .env file exists locally."
+
+    - name: "2.3 Verify .env file is strictly ignored by Git"
+      ansible.builtin.command:
+        cmd: "git check-ignore -q .env"
+        chdir: "{{ project_root }}"
+      register: git_ignore_check
+      changed_when: false
+      failed_when: git_ignore_check.rc != 0
+
+    - name: "2.4 Assert .env Git ignore status"
+      ansible.builtin.assert:
+        that:
+          - git_ignore_check.rc == 0
+        quiet: true
+        fail_msg: "SECURITY RISK: .env is NOT ignored by Git! Credentials may be leaked."
+        success_msg: "Security verified: .env is properly ignored by Git version control."
+
+    # --------------------------------------------------------------------------
+    # 3. Spring Boot Profile Segregation Audit
+    # --------------------------------------------------------------------------
+    - name: "3.1 Verify application.properties specifies default dev profile"
+      ansible.builtin.command:
+        cmd: "grep -E '^spring.profiles.active=dev' src/main/resources/application.properties"
+        chdir: "{{ project_root }}"
+      register: default_profile_check
+      changed_when: false
+
+    - name: "3.2 Verify application-dev.properties contains H2 database dialect"
+      ansible.builtin.command:
+        cmd: "grep -E 'jdbc:h2:mem:' src/main/resources/application-dev.properties"
+        chdir: "{{ project_root }}"
+      register: dev_h2_check
+      changed_when: false
+
+    - name: "3.3 Verify application-docker.properties contains PostgreSQL database configuration"
+      ansible.builtin.command:
+        cmd: "grep -E 'jdbc:postgresql:' src/main/resources/application-docker.properties"
+        chdir: "{{ project_root }}"
+      register: docker_pg_check
+      changed_when: false
+
+    - name: "3.4 Assert Spring profile segregation standards"
+      ansible.builtin.assert:
+        that:
+          - default_profile_check.rc == 0
+          - dev_h2_check.rc == 0
+          - docker_pg_check.rc == 0
+        quiet: true
+        fail_msg: "Spring Boot profile segregation violation detected in properties files."
+        success_msg: "Spring Boot multi-environment profile segregation verified successfully."
+
+    # --------------------------------------------------------------------------
+    # 4. Docker Engine & Compose Configuration Audit
+    # --------------------------------------------------------------------------
+    - name: "4.1 Validate Docker daemon availability"
+      ansible.builtin.command:
+        cmd: "docker info --format '{{ '{{' }}.ServerVersion{{ '}}' }}'"
+      register: docker_daemon_check
+      changed_when: false
+
+    - name: "4.2 Assert Docker daemon is active and responsive"
+      ansible.builtin.assert:
+        that:
+          - docker_daemon_check.rc == 0
+          - docker_daemon_check.stdout | length > 0
+        quiet: true
+        fail_msg: "Docker daemon is unreachable or not running."
+        success_msg: "Docker daemon verified active: version {{ docker_daemon_check.stdout }}"
+
+    - name: "4.3 Validate Docker Compose syntax and configuration"
+      ansible.builtin.command:
+        cmd: "docker compose config --quiet"
+        chdir: "{{ project_root }}"
+      register: compose_syntax_check
+      changed_when: false
+
+    - name: "4.4 Assert Docker Compose syntax validity"
+      ansible.builtin.assert:
+        that:
+          - compose_syntax_check.rc == 0
+        quiet: true
+        fail_msg: "Docker Compose configuration failed validation."
+        success_msg: "Docker Compose configuration is structurally valid."
+
+    # --------------------------------------------------------------------------
+    # 5. Non-Destructive Port Audit
+    # --------------------------------------------------------------------------
+    - name: "5.1 Audit Application service port (8085) availability"
+      ansible.builtin.wait_for:
+        host: "127.0.0.1"
+        port: "{{ expected_app_port | int }}"
+        state: started
+        timeout: 5
+
+    - name: "5.2 Audit PostgreSQL database port (5432) availability"
+      ansible.builtin.wait_for:
+        host: "127.0.0.1"
+        port: "{{ expected_db_port | int }}"
+        state: started
+        timeout: 5
+
+    - name: "5.3 Confirm Jenkins service (port 8080) remains undisturbed on Windows host"
+      ansible.builtin.command:
+        cmd: "powershell.exe -NoProfile -Command \"(Invoke-WebRequest -Uri http://localhost:8080/login -UseBasicParsing).StatusCode\""
+      register: jenkins_check
+      changed_when: false
+
+    - name: "5.4 Assert Jenkins is accessible and healthy on port 8080"
+      ansible.builtin.assert:
+        that:
+          - jenkins_check.rc == 0
+          - "'200' in jenkins_check.stdout"
+        quiet: true
+        fail_msg: "Jenkins service on port 8080 was disrupted!"
+        success_msg: "Confirmed: Jenkins on host port 8080 is accessible (HTTP 200 OK)."
+
+    # --------------------------------------------------------------------------
+    # 6. Container Runtime & Health State Verification
+    # --------------------------------------------------------------------------
+    - name: "6.1 Inspect application and database container health"
+      ansible.builtin.command:
+        cmd: "docker inspect --format '{{ '{{' }}.State.Status{{ '}}' }}:{{ '{{' }}.State.Health.Status{{ '}}' }}' public-toilet-app public-toilet-db"
+      register: container_health_check
+      changed_when: false
+
+    - name: "6.2 Assert both Compose containers are running and healthy"
+      ansible.builtin.assert:
+        that:
+          - container_health_check.stdout_lines[0] == "running:healthy"
+          - container_health_check.stdout_lines[1] == "running:healthy"
+        quiet: true
+        fail_msg: "Containers are not healthy: {{ container_health_check.stdout_lines }}"
+        success_msg: "Both public-toilet-app and public-toilet-db are running and healthy."
+
+    # --------------------------------------------------------------------------
+    # 7. Live Application Endpoints & Persistent Data Audit
+    # --------------------------------------------------------------------------
+    - name: "7.1 Probe Application REST API Health Endpoint"
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ expected_app_port }}/api/v1/health"
+        method: GET
+        status_code: 200
+        return_content: true
+      register: health_api_response
+
+    - name: "7.2 Assert Health API returns operational status UP"
+      ansible.builtin.assert:
+        that:
+          - health_api_response.json.status == "UP"
+        quiet: true
+        fail_msg: "Application health check did not return UP status: {{ health_api_response.content }}"
+        success_msg: "Application health check confirmed status: UP"
+
+    - name: "7.3 Verify PostgreSQL Volume Data Persistence (Ticket {{ expected_ticket_number }})"
+      ansible.builtin.uri:
+        url: "http://127.0.0.1:{{ expected_app_port }}/api/v1/tickets/3"
+        method: GET
+        status_code: 200
+        return_content: true
+      register: ticket_api_response
+
+    - name: "7.4 Assert Task 12 Persistence Ticket survived in PostgreSQL volume"
+      ansible.builtin.assert:
+        that:
+          - ticket_api_response.json.ticketNumber == expected_ticket_number
+        quiet: true
+        fail_msg: "Persistent ticket was not found! Database data may have been altered."
+        success_msg: "Persistence verified: Ticket {{ expected_ticket_number }} is intact in PostgreSQL."
+
+    # --------------------------------------------------------------------------
+    # 8. Configuration Drift Audit on Environment Parameters
+    # --------------------------------------------------------------------------
+    - name: "8.1 Inspect target audit environment file"
+      ansible.builtin.stat:
+        path: "{{ audit_env_file }}"
+      register: target_env_stat
+
+    - name: "8.2 Assert target environment file exists for audit"
+      ansible.builtin.assert:
+        that:
+          - target_env_stat.stat.exists
+        quiet: true
+        fail_msg: "Configuration Drift Audit Target file not found: {{ audit_env_file }}"
+
+    - name: "8.3 Read configuration values from target environment file"
+      ansible.builtin.command:
+        cmd: "cat {{ audit_env_file }}"
+      register: env_file_content
+      changed_when: false
+
+    - name: "8.4 Parse and audit configuration variables for drift"
+      vars:
+        app_port_found: "{{ env_file_content.stdout | regex_search('^APP_PORT=(.*)$', '\\1', multiline=True) | first | default('') }}"
+        db_port_found: "{{ env_file_content.stdout | regex_search('^DB_PORT=(.*)$', '\\1', multiline=True) | first | default('') }}"
+        db_name_found: "{{ env_file_content.stdout | regex_search('^POSTGRES_DB=(.*)$', '\\1', multiline=True) | first | default('') }}"
+        profile_found: "{{ env_file_content.stdout | regex_search('^SPRING_PROFILES_ACTIVE=(.*)$', '\\1', multiline=True) | first | default('') }}"
+      ansible.builtin.assert:
+        that:
+          - app_port_found == expected_app_port
+          - db_port_found == expected_db_port
+          - db_name_found == expected_db_name
+          - profile_found == expected_app_profile
+        quiet: true
+        fail_msg: >-
+          CONFIGURATION DRIFT DETECTED in {{ audit_env_file }}!
+          Expected [APP_PORT={{ expected_app_port }}, DB_PORT={{ expected_db_port }}, POSTGRES_DB={{ expected_db_name }}, SPRING_PROFILES_ACTIVE={{ expected_app_profile }}]
+          Found [APP_PORT={{ app_port_found }}, DB_PORT={{ db_port_found }}, POSTGRES_DB={{ db_name_found }}, SPRING_PROFILES_ACTIVE={{ profile_found }}]
+        success_msg: >-
+          Configuration consistency verified: No drift detected in {{ audit_env_file | basename }}.
+          All parameters match expected deployment baselines.
+
+    # --------------------------------------------------------------------------
+    # 9. Audit Summary
+    # --------------------------------------------------------------------------
+    - name: "9.1 Configuration Management Audit Final Summary"
+      ansible.builtin.debug:
+        msg:
+          - "=========================================================="
+          - "TASK 13 CONFIGURATION AUDIT COMPLETED SUCCESSFULLY"
+          - "=========================================================="
+          - "Project: Containerized Public Toilet Maintenance Tracker"
+          - "Audited File: {{ audit_env_file | basename }}"
+          - "Profile Segregation: application.properties (dev) & application-docker.properties (docker)"
+          - "Application Status: UP (Port 8085)"
+          - "Database Status: Healthy (Port 5432)"
+          - "Jenkins Status: Preserved (Port 8080)"
+          - "Ticket Persistence: {{ expected_ticket_number }} verified"
+          - "Drift Status: 0 Drift Detected against baseline"
+          - "Execution Mode: Idempotent read-only validation"
+          - "=========================================================="
