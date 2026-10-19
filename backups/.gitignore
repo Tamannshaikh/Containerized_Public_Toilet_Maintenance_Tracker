@@ -1,0 +1,5 @@
+# Ignore PostgreSQL database backup dumps
+*.sql
+*.dump
+*.tar
+!.gitignore
